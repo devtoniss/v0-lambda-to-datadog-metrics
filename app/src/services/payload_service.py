@@ -104,34 +104,56 @@ class PayloadService:
             
             metrica['metric'] = self._avaliar_campo(template['metric'], contexto)
             
-            # Type (obrigatório)
             if 'type' not in template:
                 logger.warning(f"Template {template_idx} sem campo 'type'")
                 return None
             
-            metrica['type'] = self._avaliar_campo(template['type'], contexto)
+            type_value = self._avaliar_campo(template['type'], contexto)
             
-            # Points (obrigatório) - formato: [[timestamp, value]]
+            # Converter número para string se necessário (compatibilidade)
+            if isinstance(type_value, int):
+                type_map = {0: 'gauge', 1: 'rate', 2: 'count', 3: 'distribution'}
+                type_value = type_map.get(type_value, 'gauge')
+            
+            metrica['type'] = type_value
+            
             if 'points' not in template:
                 logger.warning(f"Template {template_idx} sem campo 'points'")
                 return None
             
             points_template = template['points']
             if isinstance(points_template, list) and len(points_template) > 0:
-                # Avaliar cada ponto
                 points = []
                 for point in points_template:
                     if isinstance(point, dict):
-                        # Formato: {"timestamp": ..., "value": ...}
+                        # Formato v2: {"timestamp": ..., "value": ...}
                         ts = self._avaliar_campo(point.get('timestamp', timestamp_atual), contexto)
                         val = self._avaliar_campo(point.get('value'), contexto)
-                        points.append([int(ts), float(val)])
+                        # Garantir que value não seja None
+                        if val is None:
+                            logger.warning(f"Value é None para template {template_idx}, linha {linha_idx}")
+                            continue
+                        # Manter formato v2 como objeto
+                        points.append({
+                            'timestamp': int(ts),
+                            'value': float(val)
+                        })
                     elif isinstance(point, list) and len(point) == 2:
-                        # Formato: [timestamp, value]
+                        # Formato v1: [timestamp, value] - converter para v2
                         ts = self._avaliar_campo(point[0], contexto)
                         val = self._avaliar_campo(point[1], contexto)
-                        points.append([int(ts), float(val)])
+                        if val is None:
+                            logger.warning(f"Value é None para template {template_idx}, linha {linha_idx}")
+                            continue
+                        points.append({
+                            'timestamp': int(ts),
+                            'value': float(val)
+                        })
                 
+                if not points:
+                    logger.warning(f"Nenhum point válido gerado para template {template_idx}, linha {linha_idx}")
+                    return None
+                    
                 metrica['points'] = points
             else:
                 logger.warning(f"Template {template_idx} com formato de 'points' inválido")
@@ -146,34 +168,29 @@ class PayloadService:
                         tag_avaliada = self._avaliar_campo(tag, contexto)
                         if tag_avaliada:
                             tags.append(str(tag_avaliada))
-                    metrica['tags'] = tags
+                    if tags:
+                        metrica['tags'] = tags
             
-            # Host (opcional)
-            if 'host' in template:
-                host = self._avaliar_campo(template['host'], contexto)
-                if host:
-                    metrica['host'] = str(host)
-            
-            # Interval (opcional)
-            if 'interval' in template:
-                interval = self._avaliar_campo(template['interval'], contexto)
-                if interval:
-                    metrica['interval'] = int(interval)
-            
-            # Resources (opcional)
             if 'resources' in template:
                 resources_template = template['resources']
                 if isinstance(resources_template, list):
                     resources = []
                     for resource in resources_template:
                         if isinstance(resource, dict):
-                            resource_avaliado = {
-                                'name': str(self._avaliar_campo(resource.get('name', ''), contexto)),
-                                'type': str(self._avaliar_campo(resource.get('type', ''), contexto))
-                            }
+                            resource_avaliado = {}
+                            for key, value in resource.items():
+                                resource_avaliado[key] = self._avaliar_campo(value, contexto)
                             resources.append(resource_avaliado)
                     if resources:
                         metrica['resources'] = resources
+            
+            # Host (compatibilidade - converter para resources se não houver resources)
+            elif 'host' in template:
+                host = self._avaliar_campo(template['host'], contexto)
+                if host:
+                    metrica['resources'] = [{'name': str(host), 'type': 'host'}]
+            
+            logger.debug(f"Métrica gerada: {metrica}")
             
             return metrica
             
@@ -181,6 +198,8 @@ class PayloadService:
             logger.warning(
                 f"Erro ao processar template {template_idx} para linha {linha_idx}: {e}"
             )
+            logger.debug(f"Template: {template}")
+            logger.debug(f"Linha: {linha}")
             return None
     
     def _avaliar_campo(self, campo: Any, contexto: Dict[str, Any]) -> Any:

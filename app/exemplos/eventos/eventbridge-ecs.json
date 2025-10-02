@@ -4,7 +4,7 @@
   "payloads": [
     {
       "metric": "custom_aws.ecs.task.cpu_limit",
-      "type": 0,
+      "type": "gauge",
       "points": [
         {
           "timestamp": "timestamp",
@@ -20,8 +20,30 @@
       ],
       "resources": [
         {
-          "name": "linha['task_arn']",
-          "type": "\"ecs_task\""
+          "name": "linha['cluster_name']",
+          "type": "\"ecs_cluster\""
+        }
+      ]
+    },
+    {
+      "metric": "custom_aws.ecs.task.memory_limit",
+      "type": "gauge",
+      "points": [
+        {
+          "timestamp": "timestamp",
+          "value": "float(linha['memory_limit'])"
+        }
+      ],
+      "tags": [
+        "f\"account_id:{str(linha['account_id']).zfill(12)}\"",
+        "f\"cluster:{linha['cluster_name']}\"",
+        "f\"service:{linha['service_name']}\"",
+        "\"env:production\""
+      ],
+      "resources": [
+        {
+          "name": "linha['cluster_name']",
+          "type": "\"ecs_cluster\""
         }
       ]
     }

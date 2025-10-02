@@ -115,8 +115,13 @@ class DatadogService:
         headers = {
             'Content-Type': 'application/json',
             'DD-API-KEY': self.settings.datadog_api_key,
-            'DD-APPLICATION-KEY': self.settings.datadog_app_key
         }
+        
+        # Adicionar DD-APPLICATION-KEY se disponível (opcional na v2)
+        if self.settings.datadog_app_key:
+            headers['DD-APPLICATION-KEY'] = self.settings.datadog_app_key
+        
+        logger.debug(f"Payload sendo enviado: {payload}")
         
         try:
             resposta = self.session.post(
@@ -133,5 +138,7 @@ class DatadogService:
         except requests.RequestException as e:
             logger.error(f"Erro na requisição ao Datadog: {e}")
             if hasattr(e, 'response') and e.response is not None:
+                logger.error(f"Status code: {e.response.status_code}")
                 logger.error(f"Resposta de erro: {e.response.text}")
+                logger.error(f"Payload que causou erro: {payload}")
             raise

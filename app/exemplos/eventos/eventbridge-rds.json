@@ -4,7 +4,7 @@
   "payloads": [
     {
       "metric": "custom_aws.rds.iops.provisioned",
-      "type": 0,
+      "type": "gauge",
       "points": [
         {
           "timestamp": "timestamp",
@@ -17,11 +17,17 @@
         "f\"db_instance:{linha['db_instance_identifier']}\"",
         "f\"engine:{linha['engine']}\"",
         "\"env:production\""
+      ],
+      "resources": [
+        {
+          "name": "linha['db_instance_identifier']",
+          "type": "\"database\""
+        }
       ]
     },
     {
       "metric": "custom_aws.rds.storage.allocated",
-      "type": 0,
+      "type": "gauge",
       "points": [
         {
           "timestamp": "timestamp",
@@ -33,11 +39,17 @@
         "f\"account_name:{linha['account_name']}\"",
         "f\"db_instance:{linha['db_instance_identifier']}\"",
         "\"env:production\""
+      ],
+      "resources": [
+        {
+          "name": "linha['db_instance_identifier']",
+          "type": "\"database\""
+        }
       ]
     },
     {
       "metric": "custom_aws.rds.connections.max",
-      "type": 0,
+      "type": "gauge",
       "points": [
         {
           "timestamp": "timestamp",
@@ -48,6 +60,12 @@
         "f\"account_id:{str(linha['account_id']).zfill(12)}\"",
         "f\"db_instance:{linha['db_instance_identifier']}\"",
         "\"env:production\""
+      ],
+      "resources": [
+        {
+          "name": "linha['db_instance_identifier']",
+          "type": "\"database\""
+        }
       ]
     }
   ]
