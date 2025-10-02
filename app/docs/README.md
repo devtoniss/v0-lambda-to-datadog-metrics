@@ -295,5 +295,5 @@ sam local invoke -e exemplos/eventos/eventbridge-rds.json
 - [AWS Lambda Best Practices](https://docs.aws.amazon.com/lambda/latest/dg/best-practices.html)
 \`\`\`
 
-```typescriptreact file="app/src/config/constants.py" isDeleted="true"
+\`\`\`typescriptreact file="app/src/config/constants.py" isDeleted="true"
 ...deleted...
