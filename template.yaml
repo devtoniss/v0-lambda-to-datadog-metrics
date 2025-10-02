@@ -1,0 +1,81 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Lambda para envio de métricas do S3 para o Datadog
+
+Globals:
+  Function:
+    Timeout: 300
+    MemorySize: 512
+    Runtime: python3.11
+
+Parameters:
+  DatadogApiKey:
+    Type: String
+    Description: Chave de API do Datadog
+    NoEcho: true
+  
+  DatadogAppKey:
+    Type: String
+    Description: Chave de aplicação do Datadog
+    NoEcho: true
+  
+  DatadogSite:
+    Type: String
+    Description: Site do Datadog (ex datadoghq.com, datadoghq.eu)
+    Default: datadoghq.com
+  
+  S3BucketName:
+    Type: String
+    Description: Nome do bucket S3 com os arquivos CSV
+
+Resources:
+  # Função Lambda
+  MetricsProcessorFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: datadog-metrics-processor
+      CodeUri: app/
+      Handler: src.handlers.lambda_handler.lambda_handler
+      Description: Processa CSV do S3 e envia métricas para o Datadog
+      Environment:
+        Variables:
+          DATADOG_API_KEY: !Ref DatadogApiKey
+          DATADOG_APP_KEY: !Ref DatadogAppKey
+          DATADOG_SITE: !Ref DatadogSite
+          TAMANHO_LOTE: '1000'
+          TIMEOUT_REQUEST: '30'
+          MAX_TENTATIVAS: '3'
+          DELAY_RETRY: '2'
+      Policies:
+        - S3ReadPolicy:
+            BucketName: !Ref S3BucketName
+      Events:
+        ScheduledEvent:
+          Type: Schedule
+          Properties:
+            Schedule: rate(5 minutes)
+            Description: Executa a cada 5 minutos
+            Enabled: true
+            Input: !Sub |
+              {
+                "s3_bucket": "${S3BucketName}",
+                "s3_key": "metricas/dados.csv",
+                "arquivo_nome": "dados.csv",
+                "tipo_metrica": "custom"
+              }
+  
+  # Log Group
+  MetricsProcessorLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${MetricsProcessorFunction}
+      RetentionInDays: 7
+
+Outputs:
+  MetricsProcessorFunctionArn:
+    Description: ARN da função Lambda
+    Value: !GetAtt MetricsProcessorFunction.Arn
+  
+  MetricsProcessorFunctionName:
+    Description: Nome da função Lambda
+    Value: !Ref MetricsProcessorFunction

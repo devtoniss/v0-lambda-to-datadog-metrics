@@ -1,0 +1,4 @@
+nome_metrica,valor,timestamp,tags,tipo,host,intervalo
+cpu,75.5,1705315200,env:producao;servico:api;cluster:main,gauge,ecs-host-01,300
+memoria,82.3,1705315200,env:producao;servico:api;cluster:main,gauge,ecs-host-01,300
+tarefas,12,1705315200,env:producao;servico:api;cluster:main,gauge,ecs-host-01,300

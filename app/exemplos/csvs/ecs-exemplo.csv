@@ -1,0 +1,4 @@
+account_id,cluster_name,service_name,task_definition,task_arn,cpu_limit,memory_limit,region
+123456789012,prod-cluster,api-service,api-task:5,arn:aws:ecs:us-east-1:123456789012:task/prod-cluster/abc123,1024,2048,us-east-1
+123456789012,prod-cluster,worker-service,worker-task:3,arn:aws:ecs:us-east-1:123456789012:task/prod-cluster/def456,512,1024,us-east-1
+987654321098,stg-cluster,api-service,api-task:2,arn:aws:ecs:us-west-2:987654321098:task/stg-cluster/ghi789,512,1024,us-west-2

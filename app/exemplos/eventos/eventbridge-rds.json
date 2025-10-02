@@ -1,0 +1,54 @@
+{
+  "s3_bucket": "meu-bucket-metricas",
+  "s3_path": "rds/",
+  "payloads": [
+    {
+      "metric": "custom_aws.rds.iops.provisioned",
+      "type": 0,
+      "points": [
+        {
+          "timestamp": "timestamp",
+          "value": "float(linha['configured_iops_provisionado'])"
+        }
+      ],
+      "tags": [
+        "f\"account_id:{str(linha['account_id']).zfill(12)}\"",
+        "f\"account_name:{linha['account_name']}\"",
+        "f\"db_instance:{linha['db_instance_identifier']}\"",
+        "f\"engine:{linha['engine']}\"",
+        "\"env:production\""
+      ]
+    },
+    {
+      "metric": "custom_aws.rds.storage.allocated",
+      "type": 0,
+      "points": [
+        {
+          "timestamp": "timestamp",
+          "value": "float(linha['allocated_storage_gb'])"
+        }
+      ],
+      "tags": [
+        "f\"account_id:{str(linha['account_id']).zfill(12)}\"",
+        "f\"account_name:{linha['account_name']}\"",
+        "f\"db_instance:{linha['db_instance_identifier']}\"",
+        "\"env:production\""
+      ]
+    },
+    {
+      "metric": "custom_aws.rds.connections.max",
+      "type": 0,
+      "points": [
+        {
+          "timestamp": "timestamp",
+          "value": "int(linha['max_connections'])"
+        }
+      ],
+      "tags": [
+        "f\"account_id:{str(linha['account_id']).zfill(12)}\"",
+        "f\"db_instance:{linha['db_instance_identifier']}\"",
+        "\"env:production\""
+      ]
+    }
+  ]
+}

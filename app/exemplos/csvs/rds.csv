@@ -1,0 +1,6 @@
+nome_metrica,valor,timestamp,tags,tipo,host,intervalo
+cpu,45.2,1705315200,env:producao;servico:database;instance:prod-db-01,gauge,rds-prod-01,300
+conexoes,87,1705315200,env:producao;servico:database;instance:prod-db-01,gauge,rds-prod-01,300
+iops,1250,1705315200,env:producao;servico:database;instance:prod-db-01,gauge,rds-prod-01,300
+latencia_leitura,12.5,1705315200,env:producao;servico:database;instance:prod-db-01,gauge,rds-prod-01,300
+espaco_livre,45000000000,1705315200,env:producao;servico:database;instance:prod-db-01,gauge,rds-prod-01,300

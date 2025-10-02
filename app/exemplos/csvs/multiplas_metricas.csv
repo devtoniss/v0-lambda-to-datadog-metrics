@@ -1,0 +1,4 @@
+nome_metrica,valor,timestamp,tags,tipo,resources_name,resources_type
+latencia.request,120,1698667200,env:producao;servico:api;rota:/login,gauge,api-login,container
+erros.request,3,1698667200,env:producao;servico:api;rota:/login,count,api-login,container
+qtd_requisicoes,57,1698667200,env:producao;servico:api;rota:/login,count,api-login,container

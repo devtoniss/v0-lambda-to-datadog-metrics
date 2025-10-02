@@ -1,0 +1,29 @@
+{
+  "s3_bucket": "meu-bucket-metricas",
+  "s3_path": "ecs/resultados_ecs.csv",
+  "payloads": [
+    {
+      "metric": "custom_aws.ecs.task.cpu_limit",
+      "type": 0,
+      "points": [
+        {
+          "timestamp": "timestamp",
+          "value": "float(linha['cpu_limit'])"
+        }
+      ],
+      "tags": [
+        "f\"account_id:{str(linha['account_id']).zfill(12)}\"",
+        "f\"cluster:{linha['cluster_name']}\"",
+        "f\"service:{linha['service_name']}\"",
+        "f\"task_definition:{linha['task_definition']}\"",
+        "\"env:production\""
+      ],
+      "resources": [
+        {
+          "name": "linha['task_arn']",
+          "type": "\"ecs_task\""
+        }
+      ]
+    }
+  ]
+}
